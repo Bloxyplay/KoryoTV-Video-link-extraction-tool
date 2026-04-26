@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://vod.koryo.tv">
   <link rel="dns-prefetch" href="https://vod.koryo.tv">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/html/cdn/video-minimal.js"></script>
   <style>
     :root {
       --bg: #FAF8F5;
@@ -183,9 +184,9 @@
       margin-bottom: 1.5rem;
       animation: fadeInUp 0.5s ease-out 0.3s both, float 3s ease-in-out 1s infinite;
     }
-    .hero-eyebrow span {
+    .hero-eyebrow .eyebrow-dot {
       width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-      animation: pulseGlow 2s ease-in-out infinite;
+      animation: pulseGlow 2s ease-in-out infinite; flex-shrink: 0;
     }
     .hero-title {
       font-family: 'Inter', sans-serif;
@@ -343,12 +344,16 @@
 
     /* ── Video Player ── */
     .video-player-wrap {
-      position: relative; width: 100%; background: #000;
+      position: relative; width: 100%;
       border-radius: var(--radius-lg); overflow: hidden;
       box-shadow: var(--shadow-lg), 0 0 0 1px var(--border);
+      background: #000;
     }
     .video-player-wrap video {
       width: 100%; aspect-ratio: 16/9; display: block; object-fit: contain; background: #000;
+    }
+    .video-player-wrap video-player {
+      display: block; width: 100%;
     }
 
     /* ── Meta card ── */
@@ -573,6 +578,26 @@
       max-width: 1280px; margin: 0 auto;
     }
 
+    /* ── Language Toggle ── */
+    .lang-toggle {
+      display: flex; align-items: center;
+      background: var(--bg-warm); border: 1.5px solid var(--border);
+      border-radius: 8px; overflow: hidden; flex-shrink: 0;
+    }
+    .lang-btn {
+      padding: 5px 10px; font-size: 0.7rem; font-weight: 700;
+      border: none; background: transparent; cursor: pointer;
+      color: var(--text-tert); font-family: 'Inter', sans-serif;
+      letter-spacing: 0.05em; transition: all 0.2s ease;
+    }
+    .lang-btn.active {
+      background: var(--gold-gradient); background-size: 200% 200%;
+      animation: gradientShift 4s ease infinite;
+      color: #fff;
+    }
+    .lang-btn:not(.active):hover { color: var(--text); background: var(--border-light); }
+    .lang-divider { width: 1px; background: var(--border); align-self: stretch; }
+
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -608,8 +633,13 @@
       <div class="brand-name">Koryo<span>TV</span></div>
     </a>
     <div class="header-badges">
-      <span class="hbadge hbadge-live">LIVE EXTRACTOR</span>
+      <span class="hbadge hbadge-live" data-i18n="badge_live">LIVE EXTRACTOR</span>
       <span class="hbadge hbadge-outline">VOD</span>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button class="lang-btn active" id="langEN" onclick="setLang('en')" aria-label="English">EN</button>
+        <div class="lang-divider"></div>
+        <button class="lang-btn" id="langZH" onclick="setLang('zh')" aria-label="Chinese">中文</button>
+      </div>
     </div>
   </header>
 
@@ -619,31 +649,31 @@
     <div id="homeView" class="view active">
       <div class="home-content">
         <div class="hero-eyebrow">
-          <span></span>
-          MP4 Source Extractor
+          <span class="eyebrow-dot"></span>
+          <span data-i18n="eyebrow">MP4 Source Extractor</span>
         </div>
-        <h1 class="hero-title">Extract Videos from<br><span class="gradient-text">KoryoTV VOD</span></h1>
-        <p class="hero-sub">Grab the direct MP4 source from any KoryoTV VOD — watch, copy, or download it instantly.</p>
+        <h1 class="hero-title"><span data-i18n="hero_title_line1">Extract Videos from</span><br><span class="gradient-text">KoryoTV VOD</span></h1>
+        <p class="hero-sub" data-i18n="hero_sub">Grab the direct MP4 source from any KoryoTV VOD — watch, copy, or download it instantly.</p>
 
         <div class="steps-row">
-          <div class="step-item"><div class="step-num">1</div> Pick a mode</div>
+          <div class="step-item"><div class="step-num">1</div> <span data-i18n="step1">Pick a mode</span></div>
           <div class="step-arrow">&#8250;</div>
-          <div class="step-item"><div class="step-num">2</div> Paste the URL</div>
+          <div class="step-item"><div class="step-num">2</div> <span data-i18n="step2">Paste the URL</span></div>
           <div class="step-arrow">&#8250;</div>
-          <div class="step-item"><div class="step-num">3</div> Extract &amp; watch</div>
+          <div class="step-item"><div class="step-num">3</div> <span data-i18n="step3">Extract &amp; watch</span></div>
         </div>
 
         <div class="mode-grid">
           <div class="mode-card" onclick="openBrowser()">
             <div class="mode-icon-wrap">&#127760;</div>
-            <div class="mode-card-title">Browse KoryoTV</div>
-            <div class="mode-card-desc">Open vod.koryo.tv inside the app, navigate to a video, copy its URL, paste it in the bar at the top, and hit Extract.</div>
+            <div class="mode-card-title" data-i18n="mode1_title">Browse KoryoTV</div>
+            <div class="mode-card-desc" data-i18n="mode1_desc">Open vod.koryo.tv inside the app, navigate to a video, copy its URL, paste it in the bar at the top, and hit Extract.</div>
             <div class="mode-card-arrow">&#8594;</div>
           </div>
           <div class="mode-card" onclick="showDirectExtract()">
             <div class="mode-icon-wrap">&#128279;</div>
-            <div class="mode-card-title">Paste Link</div>
-            <div class="mode-card-desc">Already have the video URL? Paste it directly here to get the MP4 source immediately.</div>
+            <div class="mode-card-title" data-i18n="mode2_title">Paste Link</div>
+            <div class="mode-card-desc" data-i18n="mode2_desc">Already have the video URL? Paste it directly here to get the MP4 source immediately.</div>
             <div class="mode-card-arrow">&#8594;</div>
           </div>
         </div>
@@ -656,19 +686,19 @@
         <div class="view-header">
           <button class="btn-back-view" onclick="showHome()">&#8592;</button>
           <div class="view-header-text">
-            <h2>Direct Link Extractor</h2>
-            <p>Paste a KoryoTV video URL to extract its MP4 source</p>
+            <h2 data-i18n="extract_title">Direct Link Extractor</h2>
+            <p data-i18n="extract_sub">Paste a KoryoTV video URL to extract its MP4 source</p>
           </div>
         </div>
 
         <div class="input-card">
-          <label class="field-label" for="directUrl">KoryoTV Video URL</label>
+          <label class="field-label" for="directUrl" data-i18n="field_label">KoryoTV Video URL</label>
           <div class="input-row">
             <input type="text" id="directUrl" class="url-input"
               placeholder="https://vod.koryo.tv/view?m=P1RVV9D3B"
               onkeydown="if(event.key==='Enter') extractDirect()">
             <button class="btn-primary" id="directExtractBtn" onclick="extractDirect()">
-              <span>&#9889;</span><span>Extract</span>
+              <span>&#9889;</span><span data-i18n="btn_extract">Extract</span>
             </button>
           </div>
           <div id="directError" class="error-msg">
@@ -676,20 +706,24 @@
             <span id="directErrorText"></span>
           </div>
           <div id="directDebug" class="debug-box">
-            <div class="debug-label">API Response — check which field has the video URL</div>
+            <div class="debug-label" data-i18n="debug_label">API Response — check which field has the video URL</div>
             <div class="debug-content" id="directDebugContent"></div>
           </div>
         </div>
 
         <div id="directLoading" class="loading-box">
           <div class="spinner-ring"></div>
-          <div class="loading-label">Fetching video source...</div>
-          <div class="loading-sub" id="loadingSub">Contacting KoryoTV API</div>
+          <div class="loading-label" data-i18n="loading_label">Fetching video source...</div>
+          <div class="loading-sub" id="loadingSub" data-i18n="loading_sub">Contacting KoryoTV API</div>
         </div>
 
         <div id="directResult" class="result-box">
           <div class="video-player-wrap">
-            <video id="directVideo" playsinline controls></video>
+            <video-player>
+              <video-minimal-skin>
+                <video id="directVideo" playsinline></video>
+              </video-minimal-skin>
+            </video-player>
           </div>
 
           <div class="video-meta-card">
@@ -697,15 +731,15 @@
             <div class="v-meta" id="directVideoMeta"></div>
 
             <div class="source-box">
-              <div class="source-box-label"><span>&#9889;</span> MP4 Direct Source</div>
+              <div class="source-box-label"><span>&#9889;</span> <span data-i18n="source_label">MP4 Direct Source</span></div>
               <div class="source-row">
                 <div id="directSourceLink" class="source-url"></div>
-                <button class="btn-action btn-action-copy" id="copyBtn" onclick="copySource()">&#128203; Copy</button>
+                <button class="btn-action btn-action-copy" id="copyBtn" onclick="copySource()">&#128203; <span data-i18n="btn_copy">Copy</span></button>
               </div>
             </div>
 
             <div class="action-row">
-              <a id="directDownloadBtn" class="btn-action btn-action-download" href="#" target="_blank" download>&#8595; Download MP4</a>
+              <a id="directDownloadBtn" class="btn-action btn-action-download" href="#" target="_blank" download>&#8595; <span data-i18n="btn_download">Download MP4</span></a>
             </div>
           </div>
         </div>
@@ -719,7 +753,7 @@
   <div id="browserShell" class="browser-shell">
 
     <div class="browser-toolbar">
-      <button class="btn-back" onclick="closeBrowser()">&#8592; Back</button>
+      <button class="btn-back" onclick="closeBrowser()">&#8592; <span data-i18n="btn_back">Back</span></button>
 
       <div class="browser-url-area">
         <div class="browser-url-wrap" id="browserUrlWrap">
@@ -728,6 +762,7 @@
             type="text"
             id="browserUrlInput"
             class="browser-url-input"
+            data-i18n-placeholder="browser_placeholder"
             placeholder="Navigate to a video below &#8594; copy its URL &#8594; paste here (Ctrl+V)"
             onkeydown="if(event.key==='Enter') browserExtract()"
             oninput="onUrlInput(this.value)"
@@ -735,16 +770,16 @@
             spellcheck="false"
           >
         </div>
-        <div class="browser-url-hint" id="urlHint">Paste a vod.koryo.tv/view?m=... link and hit &#9889; Extract</div>
+        <div class="browser-url-hint" id="urlHint" data-i18n="url_hint">Paste a vod.koryo.tv/view?m=... link and hit &#9889; Extract</div>
       </div>
 
-      <button class="btn-extract" id="browserExtractBtn" onclick="browserExtract()" disabled>&#9889; Extract</button>
+      <button class="btn-extract" id="browserExtractBtn" onclick="browserExtract()" disabled>&#9889; <span data-i18n="btn_extract">Extract</span></button>
     </div>
 
     <div class="browser-body">
       <div class="browser-guide-bar">
         <div class="guide-dot"></div>
-        <span id="guideText">vod.koryo.tv &#8212; find a video &#8594; copy its URL from your browser address bar &#8594; paste above &#8594; extract</span>
+        <span id="guideText" data-i18n="guide_text">vod.koryo.tv &#8212; find a video &#8594; copy its URL from your browser address bar &#8594; paste above &#8594; extract</span>
       </div>
 
       <div class="browser-iframe-wrap">
@@ -756,7 +791,7 @@
 
       <div class="browser-status-bar">
         <div class="status-dot" id="statusDot"></div>
-        <div class="status-text" id="statusText">Browse to a video on KoryoTV, copy its page URL, then paste it in the bar above</div>
+        <div class="status-text" id="statusText" data-i18n="status_default">Browse to a video on KoryoTV, copy its page URL, then paste it in the bar above</div>
       </div>
     </div>
 
@@ -766,13 +801,13 @@
   <div id="foundOverlay" class="overlay" onclick="if(event.target===this)dismissFound()">
     <div class="found-popup" onclick="event.stopPropagation()">
       <div class="found-pulse">&#127909;</div>
-      <div class="found-title">Video source found!</div>
-      <div class="found-sub">The MP4 link has been extracted and is ready to use.</div>
+      <div class="found-title" data-i18n="found_title">Video source found!</div>
+      <div class="found-sub" data-i18n="found_sub">The MP4 link has been extracted and is ready to use.</div>
       <div id="foundVideoName" class="found-video-name"></div>
       <button id="foundCopyBtn" class="btn-found-copy" onclick="copyFromFound()">
-        <span>&#128203;</span><span>Copy MP4 Link</span>
+        <span>&#128203;</span><span data-i18n="found_copy">Copy MP4 Link</span>
       </button>
-      <button class="btn-found-dismiss" onclick="dismissFound()">Preview &amp; Watch</button>
+      <button class="btn-found-dismiss" onclick="dismissFound()" data-i18n="found_dismiss">Preview &amp; Watch</button>
     </div>
   </div>
 
@@ -782,7 +817,7 @@
     <div class="toast-msg" id="toastMsg">Done!</div>
   </div>
 
-  <footer>Not affiliated with Koryo TV &#183; For educational use only</footer>
+  <footer><span data-i18n="footer">Not affiliated with Koryo TV &#183; For educational use only</span></footer>
 
   <script>
     const API_BASE   = 'https://vod.koryo.tv/api/v1';
@@ -1031,7 +1066,7 @@
         } else {
           document.getElementById('directResult').classList.add('active');
           setTimeout(() => document.getElementById('directResult').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-          toast('Video extracted!');
+          toast(t('toast_extracted'));
         }
 
       } catch(err) {
@@ -1136,8 +1171,8 @@
       await writeToClipboard(currentSourceUrl);
       const btn = document.getElementById('foundCopyBtn');
       btn.classList.add('copied');
-      btn.innerHTML = '<span>&#10003;</span><span>Copied!</span>';
-      toast('MP4 link copied!');
+      btn.innerHTML = '<span>&#10003;</span><span>' + t('found_copy').replace('Copy', '✓') + '</span>';
+      toast(t('toast_copied'));
     }
 
     async function copySource() {
@@ -1145,10 +1180,10 @@
       const btn = document.getElementById('copyBtn');
       await writeToClipboard(currentSourceUrl);
       const orig = btn.innerHTML;
-      btn.innerHTML = '&#10003; Copied!';
+      btn.innerHTML = '&#10003; ' + (currentLang === 'zh' ? '已复制！' : 'Copied!');
       btn.classList.add('copied');
-      toast('MP4 link copied!');
-      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+      toast(t('toast_copied'));
+      setTimeout(() => { btn.innerHTML = '&#128203; ' + t('btn_copy'); btn.classList.remove('copied'); }, 2000);
     }
 
     /* ── Helpers ── */
@@ -1180,6 +1215,122 @@
       clearTimeout(el._t);
       el._t = setTimeout(() => el.classList.remove('show'), 3200);
     }
+
+    /* ── i18n ── */
+    const TRANSLATIONS = {
+      en: {
+        badge_live:          'LIVE EXTRACTOR',
+        eyebrow:             'MP4 Source Extractor',
+        hero_title_line1:    'Extract Videos from',
+        hero_sub:            'Grab the direct MP4 source from any KoryoTV VOD — watch, copy, or download it instantly.',
+        step1:               'Pick a mode',
+        step2:               'Paste the URL',
+        step3:               'Extract & watch',
+        mode1_title:         'Browse KoryoTV',
+        mode1_desc:          'Open vod.koryo.tv inside the app, navigate to a video, copy its URL, paste it in the bar at the top, and hit Extract.',
+        mode2_title:         'Paste Link',
+        mode2_desc:          'Already have the video URL? Paste it directly here to get the MP4 source immediately.',
+        extract_title:       'Direct Link Extractor',
+        extract_sub:         'Paste a KoryoTV video URL to extract its MP4 source',
+        field_label:         'KoryoTV Video URL',
+        btn_extract:         'Extract',
+        btn_back:            'Back',
+        btn_copy:            'Copy',
+        btn_download:        'Download MP4',
+        debug_label:         'API Response — check which field has the video URL',
+        loading_label:       'Fetching video source...',
+        loading_sub:         'Contacting KoryoTV API',
+        source_label:        'MP4 Direct Source',
+        browser_placeholder: 'Navigate to a video below → copy its URL → paste here (Ctrl+V)',
+        url_hint:            'Paste a vod.koryo.tv/view?m=... link and hit ⚡ Extract',
+        guide_text:          'vod.koryo.tv — find a video → copy its URL from your browser address bar → paste above → extract',
+        status_default:      'Browse to a video on KoryoTV, copy its page URL, then paste it in the bar above',
+        found_title:         'Video source found!',
+        found_sub:           'The MP4 link has been extracted and is ready to use.',
+        found_copy:          'Copy MP4 Link',
+        found_dismiss:       'Preview & Watch',
+        footer:              'Not affiliated with Koryo TV · For educational use only',
+        toast_extracted:     'Video extracted!',
+        toast_copied:        'MP4 link copied!',
+      },
+      zh: {
+        badge_live:          '实时提取器',
+        eyebrow:             'MP4 直链提取工具',
+        hero_title_line1:    '提取视频来自',
+        hero_sub:            '从任意 KoryoTV VOD 获取直接 MP4 链接 — 立即观看、复制或下载。',
+        step1:               '选择模式',
+        step2:               '粘贴链接',
+        step3:               '提取并观看',
+        mode1_title:         '浏览 KoryoTV',
+        mode1_desc:          '在应用内打开 vod.koryo.tv，导航到视频，复制其链接，粘贴到顶部栏，然后点击提取。',
+        mode2_title:         '粘贴链接',
+        mode2_desc:          '已有视频链接？直接粘贴到此处，立即获取 MP4 直链。',
+        extract_title:       '直链提取器',
+        extract_sub:         '粘贴 KoryoTV 视频链接以提取 MP4 源',
+        field_label:         'KoryoTV 视频链接',
+        btn_extract:         '提取',
+        btn_back:            '返回',
+        btn_copy:            '复制',
+        btn_download:        '下载 MP4',
+        debug_label:         'API 响应 — 检查哪个字段包含视频链接',
+        loading_label:       '正在获取视频源...',
+        loading_sub:         '正在联系 KoryoTV API',
+        source_label:        'MP4 直接来源',
+        browser_placeholder: '在下方浏览到视频 → 复制其链接 → 粘贴到此处（Ctrl+V）',
+        url_hint:            '粘贴 vod.koryo.tv/view?m=... 链接，然后点击 ⚡ 提取',
+        guide_text:          'vod.koryo.tv — 找到视频 → 从浏览器地址栏复制链接 → 粘贴到上方 → 提取',
+        status_default:      '在 KoryoTV 中浏览到视频，复制其页面链接，然后粘贴到上方',
+        found_title:         '视频源已找到！',
+        found_sub:           'MP4 链接已提取完毕，可以使用了。',
+        found_copy:          '复制 MP4 链接',
+        found_dismiss:       '预览并观看',
+        footer:              '与 Koryo TV 无关 · 仅供学习使用',
+        toast_extracted:     '视频已提取！',
+        toast_copied:        'MP4 链接已复制！',
+      }
+    };
+
+    let currentLang = 'en';
+
+    function t(key) {
+      return (TRANSLATIONS[currentLang] || TRANSLATIONS.en)[key] || TRANSLATIONS.en[key] || key;
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = t(key);
+      });
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('koryotv_lang', lang);
+      document.getElementById('langEN').classList.toggle('active', lang === 'en');
+      document.getElementById('langZH').classList.toggle('active', lang === 'zh');
+      applyTranslations();
+    }
+
+    // Auto-detect: saved preference > browser language
+    (function initLang() {
+      const saved = localStorage.getItem('koryotv_lang');
+      if (saved === 'zh' || saved === 'en') {
+        currentLang = saved;
+      } else {
+        const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+        if (browserLang.startsWith('zh')) currentLang = 'zh';
+      }
+      if (currentLang === 'zh') {
+        document.getElementById('langEN').classList.remove('active');
+        document.getElementById('langZH').classList.add('active');
+        applyTranslations();
+      }
+    })();
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') dismissFound(); });
   </script>
